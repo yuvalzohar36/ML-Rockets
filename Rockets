@@ -7,7 +7,7 @@ pygame.init()
 black=(100,100,100)
 clock = pygame.time.Clock()
 
-class rocket():
+class Rocket():
         def __init__(self):
             self.screen=pygame.display.set_mode((screen_size[0],screen_size[1]))
             self.white=(255,255,255)
@@ -21,59 +21,48 @@ class rocket():
             self.acc_y=0
             self.x=300
             self.y=570
-            pygame.display.set_caption("Rockets ML Project")
-            self.screen.fill(self.white)
-            self.rocket=pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
-            pygame.draw.rect(self.screen,self.black, self.rocket)
-            pygame.display.flip()
-        def new_rocket(self):
-
-            self.rocket=pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
-            pygame.draw.rect(self.screen,self.black, self.rocket)
+           
+        def show(self):
+            pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
+            
+        def update(self):
             self.acc_x+=random.randint(-1,1)
             self.vel_x+=self.acc_x
             self.x+=self.vel_x
             self.acc_y-=random.randint(-1,1)
             self.vel_y-=self.acc_y
             self.y+=self.vel_y
-            self.screen.fill(self.white)
-            self.rocket=pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
-            pygame.display.flip()
-            clock.tick(self.refresh)
-            
-            
-                
-            
-        def move_rocket(self):
-                
-                self.acc_x+=random.randint(-1,1)
-                self.vel_x+=self.acc_x
-                self.x+=self.vel_x
-                self.acc_y-=random.randint(-1,1)
-                self.vel_y-=self.acc_y
-                self.y+=self.vel_y
-                self.screen.fill(self.white)
-                self.rocket=pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
-                pygame.display.flip()
-                clock.tick(self.refresh)
-Rocket=rocket()
-class pop(rocket):
+            # self.screen.fill(self.white)
+            # self.rocket=pygame.draw.rect(self.screen, (self.black),[self.x, self.y, self.width, self.height])
+            # pygame.display.flip()
+            # clock.tick(self.refresh)
+
+
+class pop():
         def __init__(self):
                 self.pop_size=5
                 self.all_rockets=[]
 
         def create_pops(self):
                 for i in range(self.pop_size):
-                        self.all_rockets.append(Rocket.new_rocket())
+                        self.all_rockets.append(Rocket())
+
+        def update(self):
+                pygame.display.fill((255,255,255))
+                for rocket in self.all_rockets:
+                        rocket.update()
+                        rocket.show()
+                pygame.display.flip()
+                clock.tick(10)
     
-
-Pop=pop()
-while True :
-    #dodo.move_rocket()
+if __name__ == '__main__':
+    Pop=pop()
     Pop.create_pops()
+    while True :
+        Pop.update()
 
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
