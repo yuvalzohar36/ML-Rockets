@@ -8,7 +8,11 @@ black=(100,100,100)
 clock = pygame.time.Clock()
 pygame.font.init()
 class Rocket():
-        def __init__(self):
+        def __init__(self,ARGUMENT):
+            if ARGUMENT==None:
+                self.dna=dna(None)
+            else :
+                self.dna=ARGUMENT
             self.screen=pygame.display.set_mode((screen_size[0],screen_size[1]))
             self.white=(255,255,255)
             self.black=(0,0,0)
@@ -19,7 +23,6 @@ class Rocket():
             self.vel_x=0
             self.vel_y=0
             self.acc_y=0
-            self.dna=dna()
             self.x_rect=300
             self.y_rect=570
             self.x_circle=290
@@ -78,17 +81,17 @@ class Rocket():
         
         def collide_edges(self):
             if self.x_rect>600 or self.x_rect<0 or self.y_rect>600 or self.y_rect<0 :
-                print("collide with screen edges")
                 self.collide_edges_bool=True
 
         def distance(self):
-            self.dist = math.sqrt((self.x_rect-self.x_circle)**2 + (self.y_circle-self.y_circle)**2)
-            print (self.dist)
+            self.dist=None
+            self.dist = math.sqrt((self.x_rect-self.x_circle)**2 + (self.y_rect-self.y_circle)**2)
+            #print (self.dist)
             return 1/self.dist    #''' in this moment the distance function doesnt work'''
             
         def update(self):
             self.CalcFitness()
-            print(self.fitness)
+            #print(self.fitness)
             self.update_counter()
             self.acc_x+=self.dna.genes[self.count-1][0]
             self.vel_x+=self.acc_x
@@ -114,7 +117,7 @@ class pop():
                     
             for i in range(self.pop_size):
                 self.all_rockets[i].fitness /=maxfit
-                
+
 
             for j in range(self.pop_size):
                 long=int(self.all_rockets[j].fitness*50)
@@ -123,10 +126,10 @@ class pop():
 
         def create_pops(self):
                 for i in range(self.pop_size):
-                        self.all_rockets.append(Rocket())
+                        self.all_rockets.append(Rocket(None))
 
         def update(self):
-                Rocket().screen.fill((255,255,255))
+                Rocket(None).screen.fill((255,255,255))
                 for rocket in self.all_rockets:
                         rocket.update()
                         rocket.show()
@@ -141,44 +144,52 @@ class pop():
                 ParentA = self.mating_pool[random.randint(0,len(self.mating_pool))].dna
                 ParentB = self.mating_pool[random.randint(0,len(self.mating_pool))].dna
                 child = ParentA.crossover(ParentB)
-                newrockets[i]=Rocket(child)
+                newrockets.append(Rocket(child))
             self.all_rockets=newrockets
                 ## need child.mutation
               
 
 class dna():
-    def __init__(self):
-        self.genes=[] ##### check it , there might be some mistake here !! ! ! ! ! ! ! ! ! ! 
-        if self.genes:
-            pass
-        else:
+    def __init__(self,newgenes):
+        if newgenes==None:
             self.genes=[]
             self.lifespan=200
             for i in range(self.lifespan):
-                self.genes.append([random.randint(-1,1),random.randint(-1,1)])    
-                '''create list of genes  with two dimensions,1 - for x pos, 2 - for y pos '''
+                self.genes.append([random.randint(-1,1),random.randint(-1,1)])
+        else :
+            self.genes=newgenes   
+
+        ###self.genes=[] ##### check it , there might be some mistake here !! ! ! ! ! ! ! ! ! ! 
+        #if self.genes:
+        #    pass
+        #else:
+        #    self.genes=[]
+        #    self.lifespan=200
+        #    for i in range(self.lifespan):
+        #        self.genes.append([random.randint(-1,1),random.randint(-1,1)])    
+           ##     '''create list of genes  with two dimensions,1 - for x pos, 2 - for y pos '''
                 
     def crossover(self,Partner):
-        self.newgenes=[]
+        newgenes=[]
         middlepoint= len(self.genes)/2
         for i in range(len(self.genes)):
             if i >middlepoint:
-                self.newgenes.append(self.genes[i])
+                newgenes.append(self.genes[i])
             else:
-                self.newgenes.append(Partner.genes[i])
-        return newgenes      ##### check it , there might be some mistake here !! ! ! ! ! ! ! ! ! ! 
+                newgenes.append(Partner.genes[i])
+        return dna(newgenes)      ##### check it , there might be some mistake here !! ! ! ! ! ! ! ! ! ! 
 
 
 def main():   
     if __name__ == '__main__':
         while True:
-            DNA=dna()
-            rocket=Rocket()
+            DNA=dna(None)
+            rocket=Rocket(None)
             Pop=pop()
             Pop.create_pops() ## need to create pops only one time !! ! !! !!! !!!!!
             Pop.compare()
             Pop.select_random()
-            while Rocket().count<50 :
+            while Rocket(None).count<50  :
                 Pop.update()
 
 
