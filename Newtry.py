@@ -19,9 +19,9 @@ class Rocket:
         self.fitness = 1
         self.counter = 0
         if dna_arg is None:
-            self.DNA = DNA(None)
+            self.dna = DNA(None)
         else:
-            self.DNA = dna_arg
+            self.dna = dna_arg
         self.x = 300
         self.y = 570
         self.x_circle = 290
@@ -40,10 +40,10 @@ class Rocket:
         self.collide_bool = False
 
     def force(self):
-        self.acc_x += (self.DNA.genes[self.counter][0])
+        self.acc_x += (self.dna.genes[self.counter][0])
         self.vel_x += self.acc_x
         self.x += self.vel_x
-        self.acc_y -= (self.DNA.genes[self.counter][1])
+        self.acc_y -= (self.dna.genes[self.counter][1])
         self.vel_y -= self.acc_y
         self.y += self.vel_y
 
@@ -127,8 +127,8 @@ class Pop:
     def select(self):
         new_rockets = []
         for i in range(len(self.all_rockets)):
-            ParentA = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].DNA
-            ParentB = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].DNA
+            ParentA = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].dna
+            ParentB = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].dna
             child = ParentA.cross_over(ParentB)
             child.mutation()
             new_rockets.append(Rocket(child))
@@ -171,8 +171,8 @@ class DNA:
                 i = [random.randint(-1, 1), random.randint(-1, 0)]
 
  
-Dat = Pop()
 if __name__ == '__main__':
+    dat = Pop()
     while True:
         count = 0
         while count < 25:
@@ -180,8 +180,8 @@ if __name__ == '__main__':
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            Dat.update()
+            dat.update()
             count += 1
-        Dat.evaluate()
-        Dat.select()
+        dat.evaluate()
+        dat.select()
         
