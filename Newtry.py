@@ -47,34 +47,44 @@ class Rocket:
         self.vel_y -= self.acc_y
         self.y += self.vel_y
 
-    def collide_target(self):
+    '''def collide_target(self):
         if self.obstacle.colliderect(self.rect):
             self.collide_target_bool = True
 
     def collide(self):
         if self.x > 580 or self.x < 0 or self.y > 590 or self.y < 0:
-            self.collide_bool = True
+            self.fitness/=10
 
     def calc_dist(self):
         self.dist = math.sqrt(((self.x - self.x_circle) ** 2) + ((self.y - self.y_circle) ** 2))
-        if self.dist < 25:
-            self.collide_target_bool = True
+        if self.dist < 10:
+            self.collide_target_bool = True''' 
+
+    def stop(self):
+        if self.x > 580 or self.x < 0 or self.y > 590 or self.y < 0:
+            self.collide_bool = True
+        if self.obstacle.colliderect(self.rect):
+            self.collide_target_bool = True            
+        self.dist = math.sqrt(((self.x - self.x_circle) ** 2) + ((self.y - self.y_circle) ** 2))
+        if self.dist < 10:
+            self.collide_target_bool = True 
 
     def calc_fitness(self):
-        self.collide_target()
-        self.collide()
-        self.calc_dist()
-        if self.collide_target_bool:
-            self.fitness *= 10
-        if self.collide_bool:
-            self.fitness /= 10
+        if self.x > 580 or self.x < 0 or self.y > 590 or self.y < 0:
+            self.fitness/=10
+        if self.obstacle.colliderect(self.rect):
+            self.fitness*=10            
+        self.dist = math.sqrt(((self.x - self.x_circle) ** 2) + ((self.y - self.y_circle) ** 2))
+        self.fitness = 1/self.dist
+        if self.dist < 10:
+            self.fitness*=10 
 
     def show(self):
         self.rect = pygame.draw.rect(screen, self.black, [self.x, self.y, self.width, self.height])
         self.obstacle = pygame.draw.rect(screen, self.black, [(self.x_circle, self.y_circle), (self.width_circle, self.height_circle)])
 
     def update_counter(self):
-        if self.counter == 50:
+        if self.counter == 25:
             self.counter = 0
         self.counter += 1
         myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -83,20 +93,21 @@ class Rocket:
 
     def update(self):
         self.update_counter()
+        self.stop()
         if self.collide_target_bool is False and self.collide_bool is False:
             self.force()
-            self.collide()
-            self.collide_target()
 
 
 class Pop:
     def __init__(self):
         self.pop_size = 25
-        self.all_rockets = []
         self.mating_pool = []
-        for i in range(self.pop_size):
-            self.all_rockets.append(Rocket(None))
-
+        try:
+            var = self.all_rockets
+        except AttributeError:
+            self.all_rockets = []
+            for i in range(self.pop_size):
+                self.all_rockets.append(Rocket(None))
     def evaluate(self):
         maxfit=0
         for i in self.all_rockets:
@@ -105,24 +116,25 @@ class Pop:
                 maxfit = i.fitness
         for j in self.all_rockets:
             j.fitness /= maxfit
-            #print(j.fitness)
+        print("the max fit is :" +str(maxfit))    
+
         self.mating_pool = []
         for m in self.all_rockets:
-            num = int(m.fitness * 100)
-            #print(num)
+            num = int(m.fitness * 50)
             for i in range(num):
                 self.mating_pool.append(m)
-        print(len(self.mating_pool))
 
     def select(self):
         new_rockets = []
         for i in range(len(self.all_rockets)):
-            ParentA = self.mating_pool[random.randint(0, len(self.mating_pool))].DNA
-            ParentB = self.mating_pool[random.randint(0, len(self.mating_pool))].DNA
+            ParentA = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].DNA
+            ParentB = self.mating_pool[random.randint(0, len(self.mating_pool)-1)].DNA
             child = ParentA.cross_over(ParentB)
             child.mutation()
             new_rockets.append(Rocket(child))
         self.all_rockets = new_rockets
+        print ("The all Rockets Objects is : ")
+        print(self.all_rockets)
 
     def update(self):
         screen.fill((255, 255, 255))
@@ -139,7 +151,7 @@ class DNA:
         if gen is None:
             self.genes = []
             for i in range(self.lifespan):
-                self.genes.append([random.randint(-1, 1), random.randint(-1, 1)])
+                self.genes.append([random.randint(-1, 1), random.randint(-1, 0)])
         else:
             self.genes = gen
 
@@ -156,14 +168,14 @@ class DNA:
     def mutation(self):
         for i in self.genes:
             if random.randint(0,1) < 0.01:
-                i = [random.randint(-1, 1), random.randint(-1, 1)]
+                i = [random.randint(-1, 1), random.randint(-1, 0)]
 
-
+ 
+Dat = Pop()
 if __name__ == '__main__':
     while True:
         count = 0
-        Dat = Pop()
-        while count < 50:
+        while count < 25:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -172,3 +184,4 @@ if __name__ == '__main__':
             count += 1
         Dat.evaluate()
         Dat.select()
+        
